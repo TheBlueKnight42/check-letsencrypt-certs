@@ -13,13 +13,13 @@ The script can be run directly or sourced. The user must have execute permission
 
 ## **Install Instructions.**
 #### Link method (recommended)
-Run the install.sh script as root with the --link parameter. This makes keeping the script up to date by pulling the GitHub repository. i.e.
+Linking to the script in your cloned version of the repo makes keeping the script up to date easy by pulling the GitHub repository. Run the install.sh script as *root* with the `--link` parameter. i.e.
 ```
 sudo ./install.sh --link
 ```
 
 #### Copy method
-Run the install.sh script as root. i.e.
+Run the install.sh script as *root*. i.e.
 ```
 sudo ./install.sh
 ```
