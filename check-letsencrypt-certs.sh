@@ -142,42 +142,50 @@ function build_cert_line() {
 
     local difference_as_days=$(( ($cert_end_as_sec - $today_as_sec) / $secinday ))
 
+    # defaults
+      # endcaps are actually a text/foreground item
+      # endcap_color use highlight_color
+      # icon_color use highlight_text_color (already set)
+      # icon_background use highlight_background (already set)
+      # middle area with domain text ... same for everyone
+      # domain_text do not set, use default
+      # domain_background do not set, use default
+      # date_text_color use highlight_text (already set)
+      # date_background_color use highlight_background (already set)
     local icon="$warning"
-    local foreground_color="$c_bold_white"
-    local background_color="$c_back_dkgray"
-    local pri_color="$c_white"
-    local pri_background="$c_back_grey_234"
+    local domain_text="$c_bold_white"
+    local domain_background="$c_back_grey_234"
+    local highlight_color="$c_yellow"
+    local highlight_background="$c_back_yellow"
+    local highlight_text="$c_bold_black"
 
     if [ $(( $difference_as_days > 13 )) == 1 ]; then
       icon="$good"
-      foreground_color="$c_green"
-      background_color="$c_back_green"
-      pri_color="$c_white"
-#      pri_background="$c_back_dkgreen"
+      highlight_color="$c_green"
+      highlight_background="$c_back_green"
+      highlight_text="$c_black"
     elif [ $(( $difference_as_days > 0 )) == 1 ]; then
       icon="$warning"
-      foreground_color="$c_yellow"
-      background_color="$c_back_yellow"
-      pri_color="$c_bold_black"
-#      pri_background="$c_back_yellow"
+      highlight_color="$c_yellow"
+      highlight_background="$c_back_yellow"
+      highlight_text="$c_bold_black"
     else
       icon="$bad"
-      foreground_color="$c_red"
-      background_color="$c_back_red"
-      pri_color="$c_white"
-#      pri_background="$c_back_red"
+      highlight_color="$c_red"
+      highlight_background="$c_back_red"
+      highlight_text="$c_bold_white"
     fi
 
     local build="  "
-    build+="$c_reset""$foreground_color""$outter_left_end"
-    build+="$background_color""$pri_color""$bold"" ""$icon"" "
-    build+="$pri_background""$foreground_color""$inner_right_end"
+    build+="$highlight_color""$outter_left_end"
+    build+="$highlight_background""$highlight_text"" ""$icon"" "
+    build+="$highlight_background""$highlight_color""$inner_right_end"
 
-    build+="$pri_background""$pri_color""  ""$cert_name""  ""$after_domain_space"
+    build+="$domain_background""$domain_text""  ""$cert_name""  ""$after_domain_space"
 
-    build+="$pri_background""$foreground_color""$inner_left_end"
-    build+="$background_color""$pri_color"" ""$cert_end"" "
-    build+="$c_reset""$foreground_color""$outter_right_end"
+    build+="$domain_background""$highlight_color""$inner_left_end"
+    build+="$highlight_background""$highlight_text"" ""$cert_end"" "
+    build+="$c_reset""$highlight_color""$outter_right_end"
     build+="$c_reset"
   fi
 
