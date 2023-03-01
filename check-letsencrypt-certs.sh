@@ -198,60 +198,6 @@ function build_cert_line() {
 
 # ----------------------------------------------------
 # BlueKnight's Bash Color Library v1.1 - 2023-01-13
-# 
-# USAGE:
-# source "./bash-color-library.sh"
-#           c_reset=$(color "reset");
-#           c_black=$(color "black");
-#           c_red=$(color "red");
-#           c_green=$(color "green");
-#           c_yellow=$(color "yellow");
-#           c_blue=$(color "blue");
-#           c_pink=$(color "pink");
-#           c_cyan=$(color "cyan");
-#           c_white=$(color "white");
-#           c_dkgray=$(color "dkgray");
-#           c_gray=$(color "gray");
-#           c_silver=$(color "silver");
-#           c_gold=$(color "gold");
-#           c_bold_white=$(color "boldwhite");
-#           c_bold_gold=$(color "boldgold");
-#           c_bold_green=$(color "boldgreen");
-#           c_bold_black=$(color "boldblack");
-#           c_back_black=$(color "backblack");
-#           c_back_green=$(color "backgreen");
-#           c_back_yellow=$(color "backyellow");
-#           c_back_red=$(color "backred");
-#           c_back_dkgray=$(color "backdkgray");
-#           c_back_dkgreen=$(color "backdkgreen");
-#           c_back_dkyellow=$(color "backdkyellow");
-#           c_back_dkred=$(color "backdkred");
-#           c_back_grey_232=$(color "backgrey-232");
-#           c_back_grey_233=$(color "backgrey-233");
-#           c_back_grey_234=$(color "backgrey-234");
-#           c_back_grey_235=$(color "backgrey-235");
-#           c_back_grey_236=$(color "backgrey-236");
-#           c_back_grey_237=$(color "backgrey-237");
-#           c_back_grey_238=$(color "backgrey-238");
-#           c_back_grey_239=$(color "backgrey-239");
-#           c_back_grey_240=$(color "backgrey-240");
-#           c_back_grey_241=$(color "backgrey-241");
-#           c_back_grey_242=$(color "backgrey-242");
-#           c_back_grey_243=$(color "backgrey-243");
-#           c_back_grey_244=$(color "backgrey-244");
-#           c_back_grey_245=$(color "backgrey-245");
-#           c_back_grey_246=$(color "backgrey-246");
-#           c_back_grey_247=$(color "backgrey-247");
-#           c_back_grey_248=$(color "backgrey-248");
-#           c_back_grey_249=$(color "backgrey-249");
-#           c_back_grey_250=$(color "backgrey-250");
-#           c_back_grey_251=$(color "backgrey-251");
-#           c_back_grey_252=$(color "backgrey-252");
-#           c_back_grey_253=$(color "backgrey-253");
-#           c_back_grey_254=$(color "backgrey-254");
-# ----------------------------------------------------
-
-# ----------------------------------------------------
 # Function color - overyly simple color library but it's a start at one.
 # ----------------------------------------------------
 function color() {
@@ -421,34 +367,42 @@ certpath="/etc/letsencrypt/live"
 # Main Script Body - slim version, only check/display status of cert
 # -----------------------------------------------------------------------------
 cert_list=$(find $certpath -name cert.pem | sort -f )
-cert_array=();
-domain_array=();
+filename_array=();
+domain_from_filename_array=();
+cert_name_array=()
+cert_end_array=();
 domain_maxlength=0;
 if ! [ -z "$cert_list" ]; then
   for one_cert in $cert_list; do
-    cert_array+=("$one_cert");
-    one_domain=`echo "$one_cert" | cut -d/ -f5`;
-    domain_array+=("$one_domain");
-    if (( domain_maxlength < ${#one_domain} )); then
-      domain_maxlength="${#one_domain}";
+    filename_array+=("$one_cert");
+    domain_from_filename=`echo "$one_cert" | cut -d/ -f5`;
+    domain_from_filename_array+=("$one_domain");
+    cert_info=$(read_x509 "$one_cert")
+    cert_name=`echo "$cert_info" | cut -d, -f1`
+    cert_name_array+=("$cert_name");
+    cert_end=`echo "$cert_info" | cut -d, -f2`
+    cert_end_array+=("$cert_end");
+    if (( domain_maxlength < ${#domain_from_filename} )); then
+      domain_maxlength="${#domain_from_filename}";
     fi
   done
 fi
 
 echo ""
 echo -en "$c_bold_white""Checking LetsEncrypt SSL Certificate";
-if (( ${#cert_array[@]} > 1 )); then
+if (( ${#filename_array[@]} > 1 )); then
   echo -en "s";
 fi
 echo -e "$c_reset"
 
-if (( ${#cert_array[@]} > 0 )); then
-  for one_cert in ${cert_array[@]}; do
+if (( ${#filename_array[@]} == 0 )); then
+  echo -e "  ${c_red}No Certificate Files Found.${c_reset}"
+else
+  # add sorting here
+  for one_cert in ${filename_array[@]}; do
     one_line=$(build_cert_line "$one_cert" "$domain_maxlength")
     echo -e "$one_line"
   done
-else
-  echo -e "  ${c_red}No Certificate Files Found.${c_reset}"
 fi
 
 echo ""
