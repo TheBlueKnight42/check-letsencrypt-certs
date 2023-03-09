@@ -179,7 +179,7 @@ function build_cert_line() {
     local build="  "
     build+="$highlight_color""$outter_left_end"
     build+="$highlight_background""$highlight_text"" ""$icon"" "
-    build+="$highlight_background""$highlight_color""$inner_right_end"
+    build+="$domain_background""$highlight_color""$inner_right_end"
 
     build+="$domain_background""$domain_text""  ""$cert_name""  ""$after_domain_space"
 
