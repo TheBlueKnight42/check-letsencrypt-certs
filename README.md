@@ -19,6 +19,10 @@ Major additions and review.
   - Rewrite: Reworked the color function.
   - This version was a major update needed to make all these changes work.
 
+  2023-06-08 Update
+  - Changed 2 Day Pending icon to check mark.
+  - Added a new feature. --renew will issue separate certobot renew commands for each cert due for renewal or overdue, but not pending or expired. Run the script with the --renew flag manually as sudo may call for your password.
+
 ## **Execution**
 The script can be run directly or sourced. The user must have execute permissions for openssl and read access to the certificates. The script uses openssl to read the expiration date from the certificate and then displays the result with color coding. Green means the certificate expiration is more than 32 days away. Purple means the cert should autorenew within 2 days. Gold means the cert is within a 7 day renewal window. Yellow means the renewal is overdue and the cert will expire within 21 days. Red means the certificate is already expired. Run it directly from its location under /etc/letsencrypt/scripts. Since the script only reads the certificates, *root* permissions should not be needed.
 ```
