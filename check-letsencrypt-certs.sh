@@ -130,16 +130,17 @@ function read_x509() {
 # Useage: one_line=$(build_cert_line "$cert_end" "$cert_name" "cert_name_maxlength")
 # -----------------------------------------------------------------------------
 function build_cert_line() {
-  local domain_maxlength=0;
   local secinday=86400;
-
+  local domain_maxlength=0;
+  
   if ! [[ -z "$1" ]]; then
     if ! [[ -z "$2" ]]; then
+      local cert_end="$1";
+      local cert_name="$2";
+
       if ! [[ -z "$3" ]]; then
         domain_maxlength="$3";
       fi
-      local cert_end="$1";
-      local cert_name="$2";
 
       one_domain="$cert_name";
       after_domain_space="";
@@ -173,6 +174,7 @@ function build_cert_line() {
       local highlight_background="$c_back_yellow";
       local highlight_text="$c_black";
       local post_note=" - manual review";
+      local post_command="";
 
       local time_frames=(); # 0 or less  is red:    expired
       time_frames+=("0");   # 1 - 20     is gold:   renew overdue
@@ -189,7 +191,7 @@ function build_cert_line() {
         post_note="";
       elif [[ $(( $difference_as_days > ${time_frames[2]} )) == 1 ]]; then
         # purple: Between 30 and 32 days, alert period
-        icon="$warning";
+        icon="$good";
         highlight_color="$c_purple";
         highlight_background="$c_back_purple";
         highlight_text="$c_white";
@@ -229,6 +231,9 @@ function build_cert_line() {
       build+="${highlight_color}${outter_right_end}";
       build+="${c_reset}";
       build+="${post_note}";
+      if ! [[ -z "$post_command" ]]; then
+        $post_command
+      fi
     fi
   fi
 
@@ -318,7 +323,7 @@ function color() {
   else
       echo "$answer";
   fi
-  return 0
+  return 0;
 }
 # --- End Function Library ----------------------------------------------------
 
@@ -406,7 +411,7 @@ fi
 if ! [[ -d "$certpath" ]]; then
   echo "Certificate directory not found: $certpath";
 else
-  cert_list=$(find "$certpath" -name "cert.pem" | sort -f)
+  cert_list=$(ls -1R "$certpath/"*"/cert.pem" | sort -f)
   filename_array=();
   cert_name_array=();
   cert_end_array=();
@@ -543,10 +548,19 @@ else
     fi
     echo "";
 
-   for (( i=0; $i<${#filename_array[@]}; i++ )); do
-     one_line=$(build_cert_line "${cert_end_array[$i]}" "${cert_name_array[$i]}" "$domain_maxlength");
-     echo -e "$one_line";
-   done
+    for (( i=0; $i<${#filename_array[@]}; i++ )); do
+      one_line=$(build_cert_line "${cert_end_array[$i]}" "${cert_name_array[$i]}" "$domain_maxlength");
+      echo -e "$one_line";
+
+      if ! [[ -z "$1" ]]; then
+        if [[ "$1" == "--renew" ]]; then
+          check=`echo "$one_line" | grep -o "$warning"`;
+          if ! [[ -z "$check" ]]; then
+            sudo certbot renew --cert-name ${cert_name_array[$i]} --quiet;
+          fi
+        fi
+      fi
+    done
   fi
 fi
 
