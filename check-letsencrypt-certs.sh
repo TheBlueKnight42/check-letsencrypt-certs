@@ -179,8 +179,8 @@ function build_cert_line() {
       local time_frames=(); # 0 or less  is red:    expired
       time_frames+=("0");   # 1 - 20     is gold:   renew overdue
       time_frames+=("20");  # 21 - 30    is yellow: renew now
-      time_frames+=("30");  # 31 - 32    is purple: pending
-      time_frames+=("32");  # 33 or over is green:  good
+      time_frames+=("29");  # 30 - 31    is purple: pending
+      time_frames+=("31");  # 32 or over is green:  good
 
       if [[ $(( $difference_as_days > $(( ${time_frames[3]} )))) == 1 ]]; then
         # green: 32 or more days, good.
