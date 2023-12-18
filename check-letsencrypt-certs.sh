@@ -93,7 +93,7 @@ function read_x509() {
 
     local cert_subject_domain=`openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f3 | cut -b2-`;
 
-    local cert_fqdn_list=`openssl x509 -in "$cert_file" -nocert -ext subjectAltName | echo -En | cut -z -c39- | cut -d, -f1- --output-delimiter=""`;
+    cert_fqdn_list=$(openssl x509 -in "$cert_file" -nocert -ext subjectAltName | cut -s -d, -f1- --output-delimiter=" ");
 
     local cert_end_date=`openssl x509 -in "$cert_file" -nocert -enddate | cut -d"=" -f2`;
     local cert_end_year=`echo "$cert_end_date" | rev | cut -d" " -f2 | rev`;
